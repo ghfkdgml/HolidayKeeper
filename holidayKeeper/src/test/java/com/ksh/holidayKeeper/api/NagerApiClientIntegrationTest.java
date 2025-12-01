@@ -3,6 +3,7 @@ package com.ksh.holidayKeeper.api;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -48,5 +49,10 @@ class NagerApiClientIntegrationTest {
         // then
         assertNotNull(holidays);
         assertFalse(holidays.isEmpty(), "대한민국의 " + currentYear + "년 공휴일 목록이 비어있으면 안됩니다.");
+
+        // 공휴일 목록에 '새해'가 포함되어 있는지 확인
+        boolean foundNewYear = holidays.stream()
+                .anyMatch(holiday -> "새해".equals(holiday.get("localName")));
+        assertTrue(foundNewYear, currentYear + "년 공휴일 목록에 '새해'가 포함되어 있어야 합니다.");
     }
 }

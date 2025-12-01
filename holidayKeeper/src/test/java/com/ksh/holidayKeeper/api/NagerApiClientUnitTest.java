@@ -1,42 +1,34 @@
 package com.ksh.holidayKeeper.api;
 
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.match.MockRestRequestMatchers;
 import org.springframework.test.web.client.response.MockRestResponseCreators;
-import org.springframework.web.client.RestClient;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@ExtendWith(SpringExtension.class)
+@RestClientTest(NagerApiClient.class)
 public class NagerApiClientUnitTest {
 
+    @Autowired
     private NagerApiClient apiClient;
+
+    @Autowired
     private MockRestServiceServer mockServer;
 
-    @BeforeEach
-    void setUp() {
-        // RestTemplate 기반으로 RestClient 생성
-        RestTemplate restTemplate = new RestTemplate(); 
-
-        // Mock 서버 연결
-        mockServer = MockRestServiceServer.bindTo(restTemplate).build();
-        RestClient restClient = RestClient.create(restTemplate);
-
-        apiClient = new NagerApiClient(restClient);
-    }
-
     @Test
+    @DisplayName("특정 연도와 국가 코드로 공휴일 정보를 성공적으로 가져온다")
     void testFetchHolidays() {
         // given
+        int year = 2025;
+        String countryCode = "KR";
         String mockJson = """
                 [
                   {
@@ -50,7 +42,7 @@ public class NagerApiClientUnitTest {
 
         mockServer.expect(
                         MockRestRequestMatchers.requestTo(
-                                "https://date.nager.at/api/v3/PublicHolidays/2025/KR"
+                                "https://date.nager.at/api/v3/PublicHolidays/" + year + "/" + countryCode
                         )
                 )
                 .andRespond(
@@ -58,7 +50,7 @@ public class NagerApiClientUnitTest {
                 );
 
         // when
-        List<Map<String, Object>> result = apiClient.fetchHolidays(2025, "KR");
+        List<Map<String, Object>> result = apiClient.fetchHolidays(year, countryCode);
 
         // then
         assertEquals(1, result.size());
