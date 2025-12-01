@@ -20,7 +20,6 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -43,7 +42,7 @@ class HolidayServiceTest {
         // given
         String[] countries = {"KR"};
         int from = 2024, to = 2024, page = 0, size = 10;
-        Holiday holiday = Holiday.builder().id(1L).countryCode("KR").year(2024).name("New Year").date(LocalDate.of(2024, 1, 1)).build();
+        Holiday holiday = Holiday.builder().id(1L).countryCode("KR").holidayYear(2024).name("New Year").date(LocalDate.of(2024, 1, 1)).build();
         Page<Holiday> holidayPage = new PageImpl<>(List.of(holiday));
 
         given(holidayRepository.findHolidayByPage(eq(countries), eq(from), eq(to), any(Pageable.class))).willReturn(holidayPage);
@@ -79,8 +78,8 @@ class HolidayServiceTest {
         String[] countries = {"KR"};
         int from = 2024, to = 2024, size = 10;
         long cursorId = 0;
-        Holiday holiday1 = Holiday.builder().id(1L).countryCode("KR").year(2024).name("New Year").date(LocalDate.of(2024, 1, 1)).build();
-        Holiday holiday2 = Holiday.builder().id(2L).countryCode("KR").year(2024).name("Lunar New Year").date(LocalDate.of(2024, 2, 10)).build();
+        Holiday holiday1 = Holiday.builder().id(1L).countryCode("KR").holidayYear(2024).name("New Year").date(LocalDate.of(2024, 1, 1)).build();
+        Holiday holiday2 = Holiday.builder().id(2L).countryCode("KR").holidayYear(2024).name("Lunar New Year").date(LocalDate.of(2024, 2, 10)).build();
         List<Holiday> holidayList = List.of(holiday1, holiday2);
 
         given(holidayRepository.findHolidayByCursor(eq(countries), eq(from), eq(to), eq(cursorId), any(Pageable.class))).willReturn(holidayList);
@@ -128,7 +127,7 @@ class HolidayServiceTest {
         holidayService.upsertYearAndCountry(year, countryCode);
 
         // then
-        verify(holidayRepository).deleteByCountryCodeAndYear(countryCode, year);
+        verify(holidayRepository).deleteByCountryCodeAndHolidayYear(countryCode, year);
         verify(nagerApiClient).fetchHolidays(year, countryCode);
         verify(holidayRepository, times(2)).save(any(Holiday.class));
     }
