@@ -19,7 +19,7 @@ public class Holiday {
     private Long id;
 
     private String countryCode;
-    private int year;
+    private int holidayYear;
 
     private String localName;
     private String name;

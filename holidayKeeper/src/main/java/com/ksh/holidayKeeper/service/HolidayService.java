@@ -46,7 +46,7 @@ public class HolidayService {
     //#. 특정 연도/국가 공휴일 Upsert
     @Transactional
     public void upsertYearAndCountry(int year, String countryCode) {
-        holidayRepository.deleteByCountryCodeAndYear(countryCode, year);
+        holidayRepository.deleteByCountryCodeAndHolidayYear(countryCode, year);
 
         List<Map<String, Object>> holidays = nagerApiClient.fetchHolidays(year, countryCode);
 
@@ -54,7 +54,7 @@ public class HolidayService {
             holidayRepository.save(
                     Holiday.builder()
                             .countryCode(countryCode)
-                            .year(year)
+                            .holidayYear(year)
                             .localName((String) h.get("localName"))
                             .name((String) h.get("name"))
                             .date(LocalDate.parse((String) h.get("date")))
@@ -68,10 +68,10 @@ public class HolidayService {
         String[] sortProperties;
         if (sortBy == null || sortBy.length == 0) {
             //#. 기본 정렬
-            sortProperties = new String[]{"countryCode", "year", "date"};
+            sortProperties = new String[]{"countryCode", "holidayYear", "date"};
         } else {
             //#. 정렬 가능한 필드 화이트리스트
-            List<String> allowedSortFields = List.of("countryCode", "year", "name", "localName", "date", "type");
+            List<String> allowedSortFields = List.of("countryCode", "holidayYear", "name", "localName", "date", "type");
             for (String field : sortBy) {
                 if (!allowedSortFields.contains(field)) {
                     throw new ApiException(HttpStatus.BAD_REQUEST, "허용되지 않는 정렬 기준입니다: " + field);
@@ -110,11 +110,11 @@ public class HolidayService {
 
     @Transactional
     public void delete(String country, Integer year) {
-        holidayRepository.deleteByCountryCodeAndYear(country, year);
+        holidayRepository.deleteByCountryCodeAndHolidayYear(country, year);
     }
 
 
     private HolidayItem toItem(Holiday a) {
-        return new HolidayItem(a.getId(), a.getCountryCode(), a.getYear(), a.getLocalName(), a.getName(), a.getDate().atStartOfDay().toInstant(ZoneOffset.UTC), a.getType());
+        return new HolidayItem(a.getId(), a.getCountryCode(), a.getHolidayYear(), a.getLocalName(), a.getName(), a.getDate().atStartOfDay().toInstant(ZoneOffset.UTC), a.getType());
     }    
 }
