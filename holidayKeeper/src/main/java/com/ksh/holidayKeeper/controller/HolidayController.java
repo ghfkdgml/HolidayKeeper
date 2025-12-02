@@ -1,16 +1,15 @@
 package com.ksh.holidayKeeper.controller;
 
 import lombok.RequiredArgsConstructor;
-
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.ksh.holidayKeeper.common.ApiResponse;
 import com.ksh.holidayKeeper.dto.HolidayDtos.*;
 import com.ksh.holidayKeeper.service.HolidayService;
+
+import org.springdoc.core.annotations.ParameterObject;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 
 @RestController
 @RequestMapping("/api/holidays")
@@ -21,32 +20,21 @@ public class HolidayController {
 
     @Operation(summary = "공휴일 목록 검색 (오프셋 페이징)", description = "다양한 조건으로 공휴일 목록을 검색합니다.")
     @GetMapping
-    public ResponseEntity<ApiResponse<HolidayOffsetList>> search(
-            @RequestParam String[] countries,
-            @RequestParam Integer from,
-            @RequestParam Integer to,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "ASC") Sort.Direction direction,
-            @Parameter(description = "정렬할 필드 이름. (예: date, name)") @RequestParam(required = false) String[] sortBy,
-            @RequestParam(required = false) String type
-    ) {
-        HolidayOffsetList list = holidayService.searchByOffset(countries, from, to, type, page, size, direction, sortBy);
+    public ResponseEntity<ApiResponse<HolidayOffsetList>> search(@ParameterObject HolidaySearchRequest request) {
+        HolidayOffsetList list = holidayService.searchByOffset(request.getCountries(), request.getFrom(), request.getTo(), request.getType(), request.getPage(), request.getSize(), request.getDirection(), request.getSortBy());
 
         return ResponseEntity.ok(ApiResponse.ok(list));
     }
 
     @Operation(summary = "공휴일 목록 검색 (커서 페이징)", description = "커서 ID를 기반으로 다음 페이지의 공휴일 목록을 검색합니다.")
     @GetMapping("/search-cursor")
-    public ResponseEntity<ApiResponse<HolidayCursorList>> searchCursor(
-            @RequestParam String[] countries,
-            @RequestParam Integer from,
-            @RequestParam Integer to,
-            @RequestParam(defaultValue = "0") long cursor,
-            @RequestParam(defaultValue = "20") int size,
-            @Parameter(description = "검색할 공휴일 타입 (예: Public, Bank)") @RequestParam(required = false) String type
-    ) {
-        HolidayCursorList list = holidayService.searchByCursor(countries, from, to, type, cursor, size);
+    public ResponseEntity<ApiResponse<HolidayCursorList>> searchCursor(@ParameterObject HolidayCursorSearchRequest request) {
+        HolidayCursorList list = holidayService.searchByCursor(request.getCountries(),
+                request.getFrom(),
+                request.getTo(),
+                request.getType(),
+                request.getCursor(),
+                request.getSize());
 
         return ResponseEntity.ok(ApiResponse.ok(list));
     }
