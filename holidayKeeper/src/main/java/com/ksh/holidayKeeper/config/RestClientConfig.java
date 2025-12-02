@@ -1,4 +1,4 @@
-package com.ksh.holidayKeeper.api;
+package com.ksh.holidayKeeper.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
