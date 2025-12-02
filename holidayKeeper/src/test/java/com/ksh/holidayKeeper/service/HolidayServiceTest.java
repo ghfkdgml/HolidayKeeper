@@ -42,19 +42,20 @@ class HolidayServiceTest {
         // given
         String[] countries = {"KR"};
         int from = 2024, to = 2024, page = 0, size = 10;
+        String type = "Public";
         Holiday holiday = Holiday.builder().id(1L).countryCode("KR").holidayYear(2024).name("New Year").date(LocalDate.of(2024, 1, 1)).build();
         Page<Holiday> holidayPage = new PageImpl<>(List.of(holiday));
 
-        given(holidayRepository.findHolidayByPage(eq(countries), eq(from), eq(to), any(Pageable.class))).willReturn(holidayPage);
+        given(holidayRepository.findHolidayByPage(eq(countries), eq(from), eq(to), eq(type), any(Pageable.class))).willReturn(holidayPage);
 
         // when
-        HolidayDtos.HolidayOffsetList result = holidayService.searchByOffset(countries, from, to, page, size, Sort.Direction.ASC, new String[]{"date"});
+        HolidayDtos.HolidayOffsetList result = holidayService.searchByOffset(countries, from, to, type, page, size, Sort.Direction.ASC, new String[]{"date"});
 
         // then
         assertThat(result.items()).hasSize(1);
         assertThat(result.total()).isEqualTo(1);
         assertThat(result.items().get(0).name()).isEqualTo("New Year");
-        verify(holidayRepository).findHolidayByPage(eq(countries), eq(from), eq(to), any(Pageable.class));
+        verify(holidayRepository).findHolidayByPage(eq(countries), eq(from), eq(to), eq(type), any(Pageable.class));
     }
 
     @Test
@@ -63,10 +64,11 @@ class HolidayServiceTest {
         // given
         String[] countries = {"KR"};
         int from = 2024, to = 2024, page = 0, size = 10;
+        String type = "Public";
         String[] sortBy = {"invalidField"};
 
         // when & then
-        assertThatThrownBy(() -> holidayService.searchByOffset(countries, from, to, page, size, Sort.Direction.ASC, sortBy))
+        assertThatThrownBy(() -> holidayService.searchByOffset(countries, from, to, type, page, size, Sort.Direction.ASC, sortBy))
                 .isInstanceOf(ApiException.class)
                 .hasMessageContaining("허용되지 않는 정렬 기준입니다");
     }
@@ -77,20 +79,21 @@ class HolidayServiceTest {
         // given
         String[] countries = {"KR"};
         int from = 2024, to = 2024, size = 10;
+        String type = "Public";
         long cursorId = 0;
         Holiday holiday1 = Holiday.builder().id(1L).countryCode("KR").holidayYear(2024).name("New Year").date(LocalDate.of(2024, 1, 1)).build();
         Holiday holiday2 = Holiday.builder().id(2L).countryCode("KR").holidayYear(2024).name("Lunar New Year").date(LocalDate.of(2024, 2, 10)).build();
         List<Holiday> holidayList = List.of(holiday1, holiday2);
 
-        given(holidayRepository.findHolidayByCursor(eq(countries), eq(from), eq(to), eq(cursorId), any(Pageable.class))).willReturn(holidayList);
+        given(holidayRepository.findHolidayByCursor(eq(countries), eq(from), eq(to), eq(type), eq(cursorId), any(Pageable.class))).willReturn(holidayList);
 
         // when
-        HolidayDtos.HolidayCursorList result = holidayService.searchByCursor(countries, from, to, cursorId, size);
+        HolidayDtos.HolidayCursorList result = holidayService.searchByCursor(countries, from, to, type, cursorId, size);
 
         // then
         assertThat(result.items()).hasSize(2);
         assertThat(result.nextCursor()).isEqualTo(2L); // 마지막 아이템의 ID
-        verify(holidayRepository).findHolidayByCursor(eq(countries), eq(from), eq(to), eq(cursorId), any(Pageable.class));
+        verify(holidayRepository).findHolidayByCursor(eq(countries), eq(from), eq(to), eq(type), eq(cursorId), any(Pageable.class));
     }
 
     @Test
@@ -99,11 +102,12 @@ class HolidayServiceTest {
         // given
         String[] countries = {"KR"};
         int from = 2024, to = 2024, size = 10;
+        String type = "Public";
         long cursorId = 100;
-        given(holidayRepository.findHolidayByCursor(eq(countries), eq(from), eq(to), eq(cursorId), any(Pageable.class))).willReturn(List.of());
+        given(holidayRepository.findHolidayByCursor(eq(countries), eq(from), eq(to), eq(type), eq(cursorId), any(Pageable.class))).willReturn(List.of());
 
         // when
-        HolidayDtos.HolidayCursorList result = holidayService.searchByCursor(countries, from, to, cursorId, size);
+        HolidayDtos.HolidayCursorList result = holidayService.searchByCursor(countries, from, to, type, cursorId, size);
 
         // then
         assertThat(result.items()).isEmpty();

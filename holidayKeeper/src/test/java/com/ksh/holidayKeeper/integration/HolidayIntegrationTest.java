@@ -5,13 +5,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ksh.holidayKeeper.api.NagerApiClient;
+import com.ksh.holidayKeeper.config.TestMockConfig;
 import com.ksh.holidayKeeper.entity.Holiday;
 import com.ksh.holidayKeeper.repository.HolidayRepository;
 
@@ -27,8 +28,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 @Transactional
+@Import(TestMockConfig.class)
 @ActiveProfiles("test")
 class HolidayIntegrationTest {
 
@@ -37,16 +39,16 @@ class HolidayIntegrationTest {
 
     @Autowired
     private HolidayRepository holidayRepository;
-
-    @MockBean
+    
+    @Autowired
     private NagerApiClient nagerApiClient;
 
     @Test
     @DisplayName("통합 테스트: GET /api/holidays - 오프셋 페이징 검색")
     void search_OffsetPaging_Integration() throws Exception {
         // given
-        holidayRepository.save(Holiday.builder().countryCode("KR").holidayYear(2024).name("New Year").date(LocalDate.of(2024, 1, 1)).type("Public").build());
-        holidayRepository.save(Holiday.builder().countryCode("KR").holidayYear(2024).name("Independence Movement Day").date(LocalDate.of(2024, 3, 1)).type("Public").build());
+        holidayRepository.save(Holiday.builder().countryCode("KR").holidayYear(2024).name("New Year").date(LocalDate.of(2024, 1, 1)).types("Public").build());
+        holidayRepository.save(Holiday.builder().countryCode("KR").holidayYear(2024).name("Independence Movement Day").date(LocalDate.of(2024, 3, 1)).types("Public").build());
 
         // when & then
         mockMvc.perform(get("/api/holidays")
@@ -64,9 +66,9 @@ class HolidayIntegrationTest {
     @DisplayName("통합 테스트: GET /api/holidays/search-cursor - 커서 페이징 검색")
     void search_CursorPaging_Integration() throws Exception {
         // given
-        holidayRepository.save(Holiday.builder().countryCode("KR").holidayYear(2024).name("New Year").date(LocalDate.of(2024, 1, 1)).type("Public").build());
-        holidayRepository.save(Holiday.builder().countryCode("KR").holidayYear(2024).name("Independence Movement Day").date(LocalDate.of(2024, 3, 1)).type("Public").build());
-        holidayRepository.save(Holiday.builder().countryCode("US").holidayYear(2024).name("New Year").date(LocalDate.of(2024, 1, 1)).type("Public").build());
+        holidayRepository.save(Holiday.builder().countryCode("KR").holidayYear(2024).name("New Year").date(LocalDate.of(2024, 1, 1)).types("Public").build());
+        holidayRepository.save(Holiday.builder().countryCode("KR").holidayYear(2024).name("Independence Movement Day").date(LocalDate.of(2024, 3, 1)).types("Public").build());
+        holidayRepository.save(Holiday.builder().countryCode("US").holidayYear(2024).name("New Year").date(LocalDate.of(2024, 1, 1)).types("Public").build());
 
         // when & then
         mockMvc.perform(get("/api/holidays/search-cursor")
@@ -117,8 +119,8 @@ class HolidayIntegrationTest {
         // given
         int year = 2024;
         String countryCode = "KR";
-        holidayRepository.save(Holiday.builder().countryCode("KR").holidayYear(2024).name("New Year").date(LocalDate.of(2024, 1, 1)).type("Public").build());
-        holidayRepository.save(Holiday.builder().countryCode("KR").holidayYear(2024).name("Independence Movement Day").date(LocalDate.of(2024, 3, 1)).type("Public").build());
+        holidayRepository.save(Holiday.builder().countryCode("KR").holidayYear(2024).name("New Year").date(LocalDate.of(2024, 1, 1)).types("Public").build());
+        holidayRepository.save(Holiday.builder().countryCode("KR").holidayYear(2024).name("Independence Movement Day").date(LocalDate.of(2024, 3, 1)).types("Public").build());
 
         // when
         mockMvc.perform(delete("/api/holidays")
