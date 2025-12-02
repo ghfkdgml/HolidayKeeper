@@ -1,11 +1,13 @@
 package com.ksh.holidayKeeper.controller;
 
+import com.ksh.holidayKeeper.config.TestMockConfig;
 import com.ksh.holidayKeeper.dto.HolidayDtos;
 import com.ksh.holidayKeeper.service.HolidayService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -20,6 +22,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(HolidayController.class)
+@Import(TestMockConfig.class)
 class HolidayControllerTest {
 
     @Autowired
@@ -33,14 +36,13 @@ class HolidayControllerTest {
     void search_OffsetPaging_Success() throws Exception {
         // given
         String[] countries = {"KR"};
-        int from = 2024, to = 2024, page = 0, size = 10;
-        String type = "Public";
+        int from = 2024, to = 2024, page = 0, size = 10;        
         Sort.Direction direction = Sort.Direction.ASC;
 
         HolidayDtos.HolidayItem item = new HolidayDtos.HolidayItem(1L, "KR", 2024, "신정", "New Year", Instant.now(), "Public");
         HolidayDtos.HolidayOffsetList responseDto = new HolidayDtos.HolidayOffsetList(List.of(item), 1, page, size);
 
-        given(holidayService.searchByOffset(eq(countries), eq(from), eq(to), eq(type), eq(page), eq(size), eq(direction), isNull()))
+        given(holidayService.searchByOffset(eq(countries), eq(from), eq(to), isNull(), eq(page), eq(size), eq(direction), isNull()))
                 .willReturn(responseDto);
 
         // when & then
@@ -63,13 +65,12 @@ class HolidayControllerTest {
         // given
         String[] countries = {"KR"};
         int from = 2024, to = 2024, size = 10;
-        String type = "Public";
         long cursor = 0;
 
         HolidayDtos.HolidayItem item = new HolidayDtos.HolidayItem(1L, "KR", 2024, "신정", "New Year", Instant.now(), "Public");
         HolidayDtos.HolidayCursorList responseDto = new HolidayDtos.HolidayCursorList(List.of(item), 1L);
 
-        given(holidayService.searchByCursor(eq(countries), eq(from), eq(to), eq(type), eq(cursor), eq(size))).willReturn(responseDto);
+        given(holidayService.searchByCursor(eq(countries), eq(from), eq(to), isNull(), eq(cursor), eq(size))).willReturn(responseDto);
 
         // when & then
         mockMvc.perform(get("/api/holidays/search-cursor")

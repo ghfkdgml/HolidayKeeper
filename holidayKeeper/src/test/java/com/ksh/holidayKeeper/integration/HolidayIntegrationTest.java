@@ -12,7 +12,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ksh.holidayKeeper.api.NagerApiClient;
-import com.ksh.holidayKeeper.config.TestMockConfig;
+import com.ksh.holidayKeeper.config.ApiMockConfig;
 import com.ksh.holidayKeeper.entity.Holiday;
 import com.ksh.holidayKeeper.repository.HolidayRepository;
 
@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
 @Transactional
-@Import(TestMockConfig.class)
+@Import(ApiMockConfig.class)
 @ActiveProfiles("test")
 class HolidayIntegrationTest {
 

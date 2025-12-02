@@ -4,21 +4,25 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.match.MockRestRequestMatchers;
 import org.springframework.test.web.client.response.MockRestResponseCreators;
+
+import com.ksh.holidayKeeper.config.RestClientConfig;
 
 import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@Import(RestClientConfig.class)
 @RestClientTest(NagerApiClient.class)
 public class NagerApiClientUnitTest {
 
     @Autowired
-    private NagerApiClient apiClient;
+    private NagerApiClient nagerApiClient;
 
     @Autowired
     private MockRestServiceServer mockServer;
@@ -50,7 +54,7 @@ public class NagerApiClientUnitTest {
                 );
 
         // when
-        List<Map<String, Object>> result = apiClient.fetchHolidays(year, countryCode);
+        List<Map<String, Object>> result = nagerApiClient.fetchHolidays(year, countryCode);
 
         // then
         assertEquals(1, result.size());

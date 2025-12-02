@@ -5,6 +5,9 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
+
+import com.ksh.holidayKeeper.config.TestMockConfig;
 
 import java.time.Year;
 import java.util.List;
@@ -15,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @Tag("integration")
 @DisplayName("Nager API 실제 연동 테스트")
+@Import(TestMockConfig.class)
 class NagerApiClientIntegrationTest {
 
     @Autowired

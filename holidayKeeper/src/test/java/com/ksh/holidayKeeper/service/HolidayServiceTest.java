@@ -43,7 +43,7 @@ class HolidayServiceTest {
         String[] countries = {"KR"};
         int from = 2024, to = 2024, page = 0, size = 10;
         String type = "Public";
-        Holiday holiday = Holiday.builder().id(1L).countryCode("KR").holidayYear(2024).name("New Year").date(LocalDate.of(2024, 1, 1)).build();
+        Holiday holiday = Holiday.builder().id(1L).countryCode("KR").holidayYear(2024).name("New Year").date(LocalDate.of(2024, 1, 1)).types(type).build();
         Page<Holiday> holidayPage = new PageImpl<>(List.of(holiday));
 
         given(holidayRepository.findHolidayByPage(eq(countries), eq(from), eq(to), eq(type), any(Pageable.class))).willReturn(holidayPage);
@@ -121,8 +121,8 @@ class HolidayServiceTest {
         int year = 2024;
         String countryCode = "KR";
         List<Map<String, Object>> holidaysFromApi = List.of(
-                Map.of("date", "2024-01-01", "localName", "신정", "name", "New Year's Day", "type", "Public"),
-                Map.of("date", "2024-03-01", "localName", "삼일절", "name", "Independence Movement Day", "type", "Public")
+                Map.of("date", "2024-01-01", "localName", "신정", "name", "New Year's Day", "types", List.of("Public")),
+                Map.of("date", "2024-03-01", "localName", "삼일절", "name", "Independence Movement Day", "types", List.of("Public"))
         );
 
         given(nagerApiClient.fetchHolidays(year, countryCode)).willReturn(holidaysFromApi);
@@ -131,8 +131,9 @@ class HolidayServiceTest {
         holidayService.upsertYearAndCountry(year, countryCode);
 
         // then
-        verify(holidayRepository).deleteByCountryCodeAndHolidayYear(countryCode, year);
+        // verify(holidayRepository).deleteByCountryCodeAndHolidayYear(countryCode, year);
         verify(nagerApiClient).fetchHolidays(year, countryCode);
+        verify(holidayRepository, times(2)).findByCountryCodeAndDate(eq(countryCode), any(LocalDate.class));
         verify(holidayRepository, times(2)).save(any(Holiday.class));
     }
 }
