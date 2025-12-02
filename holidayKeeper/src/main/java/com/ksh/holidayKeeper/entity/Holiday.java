@@ -11,7 +11,12 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "holidays")
+@Table(name = "holidays",
+    uniqueConstraints = {
+        @UniqueConstraint(
+            name = "UK_holiday_country_date",
+            columnNames = {"countryCode", "date"}
+        )})
 public class Holiday {
 
     @Id
@@ -25,5 +30,5 @@ public class Holiday {
     private String name;
 
     private LocalDate date;
-    private String type;
+    private String types;
 }
