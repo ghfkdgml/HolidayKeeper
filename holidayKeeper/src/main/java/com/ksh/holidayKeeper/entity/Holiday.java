@@ -12,7 +12,10 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 @Table(name = "holidays",
-    uniqueConstraints = {
+    indexes = {
+        @Index(name = "idx_holiday_search_and_sort", columnList = "countryCode, holidayYear, types, date")
+    },
+    uniqueConstraints = {    
         @UniqueConstraint(
             name = "UK_holiday_country_date",
             columnNames = {"countryCode", "date"}
